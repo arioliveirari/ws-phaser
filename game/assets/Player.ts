@@ -13,10 +13,12 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     // Agregar el player al mundo fisico
     scene.physics.add.existing(this)
 
-    this.setCollideWorldBounds(true);
+    this.setCollideWorldBounds(true)
     if(this.body) {
       const body = (this.body as Phaser.Physics.Arcade.Body)
-      body.onWorldBounds = true;
+      body.onWorldBounds = true
+
+    this.body.setSize(60,150,true)
     }
   }
 
