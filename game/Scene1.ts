@@ -1,62 +1,63 @@
 
 import Phaser from "phaser";
 import Player from "./assets/Player";
-import Map0 from "./maps/Map0";
-import { finished } from "stream";
+import Mapa from "./maps/Mapa1";
+
 // Scene in class
-
-let finishedCircuit = false
-
 class Scene1 extends Phaser.Scene {
+  cursors?: Phaser.Types.Input.Keyboard.CursorKeys
   monchi?: Player
-  map?: Map0
-  cursors?: Phaser.Types.Input.Keyboard.CursorKeys 
-
-  
-  preload(this: Scene1) {
+  graphics?: Phaser.GameObjects.Graphics
+  map?: Mapa
+  preload(this: Phaser.Scene) {
+    /* Load assets for game */
     this.load.spritesheet("character", "/game/character.png", { frameWidth: 220, frameHeight: 162 });
+    this.load.image("background", "/game/background.png");
     this.load.image("plataformaA", "/game/platform1.png");
     this.load.image("plataformaB", "/game/platform1B.png");
+    this.load.image("plataforma2", "/game/platform2.png");
+    this.load.image("cloud", "/game/cloud.png");
   }
 
 
   create(this: Scene1) {
+    this.map = new Mapa(this);
+    this.map.createMap();
+    const { x, y } = this.map.startingPoint;
+    this.monchi = new Player(this, x, y, "character", 2); // this.physics.add.sprite(100, 100, "character", 2).setScale(0.5);
 
-    this.map = new Map0(this)
-    this.monchi = new Player(this, 100, 100, "character", 2)
+    /* Camera */
+    this.cameras.main.startFollow(this.monchi)
 
-    
 
-    const [floor, finishFloor] = this.map.createMap()
+    const touch = () => {
+      if (this.monchi) this.monchi.idle()
+    }
 
     const lose = () => {
       this.scene.restart()
     }
 
-    this.physics.add.collider(this.monchi, floor)
+    if (this.map.pisos) this.physics.add.collider(this.monchi, this.map.pisos, touch);
 
-    this.physics.add.collider(this.monchi, finishFloor, lose)
+    this.physics.world.on('worldbounds', (body: Phaser.Physics.Arcade.Sprite, top: boolean, down: boolean, left: boolean, right: boolean) => {
+      if (down) lose()
+    }, this);
+    //  .on('worldbounds', lose, this)
 
-    this.physics.overlap(this.monchi, finishFloor,() => {finishedCircuit = true})
-    this.cameras.main.startFollow(this.monchi)
-
+    /* Controls */
     this.cursors = this.input.keyboard?.createCursorKeys()
 
-   
-
-    this.physics.world.on('worldbounds', (body: Phaser.Physics.Arcade.Sprite,top: boolean,down: boolean,left: boolean,right: boolean) => {
-      if(down) lose()
-    },this);
   }
 
   update(this: Scene1) {
-    
-    if (this.monchi) {this.monchi.checkMove(this.cursors)}
+    /* Attach controls to player */
+    if (this.monchi) {
+      this.monchi.checkMove(this.cursors)
+      if(this.map) this.map.animateBackground(this.monchi)
+    }
 
-    if (finishedCircuit) {console.log("ola")}
-    finishedCircuit = false
   }
-  
 }
 
 export default Scene1 

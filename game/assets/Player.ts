@@ -1,29 +1,13 @@
+
 import Phaser from "phaser";
-
+// Scene in class
 class Player extends Phaser.Physics.Arcade.Sprite {
-  isJumping: boolean = false
-  constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame: number) {
-    super(scene, x, y, texture, frame)
-
-    this.createAnims(scene);
-
-    this.setScale(0.5)
-    // Agregar el player al mundo visual
-    scene.add.existing(this)
-    // Agregar el player al mundo fisico
-    scene.physics.add.existing(this)
-
-    this.setCollideWorldBounds(true)
-    if(this.body) {
-      const body = (this.body as Phaser.Physics.Arcade.Body)
-      body.onWorldBounds = true
-
-    this.body.setSize(60,150,true)
-    }
-  }
-
-  createAnims(scene: Phaser.Scene) {
-
+  isJumping = false;
+  scene: Phaser.Scene;
+  constructor(scene: Phaser.Scene, x: number, y: number, texture: string | Phaser.Textures.Texture, frame?: string | number | undefined) {
+    super(scene,x,y,texture)
+    this.scene = scene;
+    /* Monchi animations */
     const monchiJumpFrames = scene.anims.generateFrameNumbers("character", { frames: [0, 1, 2, 3, 2, 1, 0] })
     const monchiMoveFrames = scene.anims.generateFrameNumbers("character", { frames: [0, 1, 0, 1, 0] })
     const monchiJumpConfig = {
@@ -40,13 +24,32 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     }
     scene.anims.create(monchiJumpConfig)
     scene.anims.create(monchiMoveConfig)
+    /* Monchi animations */
+
+    /* Monchi add to physic world */
+    scene.physics.add.existing(this);
     
+    /* Monchi change size and bounce */
+    this.body?.setSize(20,100)
+    this.body?.setOffset(100,50)
+    this.setScale(0.6)
+    this.setBounce(0);
+
+    /* Monchi add to scene */
+    scene.add.existing(this);
+
+    /* Monchi Collission with end of map */
+    this.setCollideWorldBounds(true);
+    if(this.body) {
+      const body = (this.body as Phaser.Physics.Arcade.Body)
+      body.onWorldBounds = true;
+    }
   }
 
   idle() {
     this.isJumping = false;
     this.setVelocityX(0);
-    this.setVelocityY(0);
+    this.setVelocityY(300);
   }
 
   jump() {
@@ -93,6 +96,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
       } 
     }
   }
+
+
 }
 
-export default Player
+export default Player 

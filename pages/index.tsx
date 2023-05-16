@@ -15,7 +15,7 @@ export default function Home() {
     //Load phaser async when windows is ready
     import("phaser").then(setPhaser) 
     //Load scenes async when windows is ready
-    import("@/game/Scene1").then((scene1) => setScenes([scene1.default]))
+    import("@/game/Scene4").then((scene1) => setScenes([scene1.default]))
   }, [])
  
   React.useEffect(() => {
@@ -33,9 +33,9 @@ export default function Home() {
         physics: {
           default: "arcade",
           arcade: {
-            overlapBias: 1000,
-            gravity: { y: 900 },
-            debug: true
+            overlapBias: 100,
+            gravity: { y: 1000 },
+            // debug: true
           }
         } 
       }
@@ -45,6 +45,6 @@ export default function Home() {
   }, [phaser, scenes])
 
   return (
-    <div id="game-container" />
+    <div id="game-container" style={{ overflow: "hidden" }} />
   )
 }
